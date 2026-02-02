@@ -8,31 +8,33 @@ jobs:
     name: check version, and release
     runs-on: ubuntu-latest
     steps:
-    - name: checkout
-      uses: actions/checkout@v3
-    - name: setup Node
-      uses: actions/setup-node@v3
-      with:
-        registry-url: 'https://registry.npmjs.org'
-    - name: Install Packages
-      run: npm install
-    - name: test
-      run: npm run test
-    - name: check can npm-publish
-      run: npx can-npm-publish
-    - name: release
-      run: npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-    - name: make alias package
-      run: npm run make-alias-package
-    - name: check can npm-publish alias
-      run: |+
-        cd ./alias-package
-        npx can-npm-publish
-    - name: release alias
-      run: |+
-        cd ./alias-package
-        npm publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+      - name: Install Packages
+        run: npm install
+      - name: test
+        run: npm run test
+      - name: check can npm-publish
+        run: npx can-npm-publish
+      - name: release
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: make alias package
+        run: npm run make-alias-package
+      - name: check can npm-publish alias
+        run: |+
+          cd ./alias-package
+          npx can-npm-publish
+      - name: release alias
+        run: |+
+          cd ./alias-package
+          npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

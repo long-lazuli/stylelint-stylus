@@ -1,104 +1,104 @@
 {
-    "name": "stylelint-stylus",
-    "version": "1.0.0",
-    "description": "Stylelint plugin for Stylus",
-    "main": "lib/index.js",
-    "files": [
-        "lib",
-        "custom-syntax",
-        "standard",
-        "recommended",
-        "base-config",
-        "no-stylus"
-    ],
-    "scripts": {
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix",
-        "test:base": "mocha \"tests/runs/**/*.js\" --reporter dot --timeout 60000",
-        "test": "nyc npm run test:base -- --timeout 60000",
-        "cover:report": "nyc report --reporter=html",
-        "test:cover": "npm run test && npm run cover:report",
-        "update-fixtures": "cross-env UPDATE_FIXTURES=true npm run test:base",
-        "preversion": "npm run update && npm run test",
-        "version": "npm run lint -- --fix && git add .",
-        "update": "node ./scripts/update.js",
-        "docs:watch": "vitepress dev docs",
-        "docs:build": "vitepress build docs",
-        "docs:build-and-preview": "npm run docs:build && npx http-server docs/.vitepress/dist",
-        "stylelint": "stylelint \"docs/.vitepress/**/*.css\" \"docs/.vitepress/**/*.vue\" \"docs/.vitepress/**/*.styl\"",
-        "make-alias-package": "node ./scripts/make-alias-package.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/stylus/stylelint-stylus.git"
-    },
-    "keywords": [
-        "stylelint-plugin",
-        "stylelint",
-        "stylus",
-        "lint",
-        "linter",
-        "pretty",
-        "beautify"
-    ],
-    "author": "Yosuke Ota",
-    "funding": "https://opencollective.com/stylus",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/stylus/stylelint-stylus/issues"
-    },
-    "homepage": "https://stylus.github.io/stylelint-stylus/",
-    "peerDependencies": {
-        "postcss-syntax": "^0.36.2",
-        "stylelint": "^13.2.1 || ^14 || ^15 || ^16"
-    },
-    "peerDependenciesMeta": {
-        "postcss-syntax": {
-            "optional": true
-        }
-    },
-    "devDependencies": {
-        "@ota-meshi/eslint-plugin": "^0.10.0",
-        "@shikijs/vitepress-twoslash": "^1.2.2",
-        "@types/lodash": "^4.14.149",
-        "cross-env": "^7.0.2",
-        "eslint": "^8.0.0",
-        "eslint-config-prettier": "^8.0.0",
-        "eslint-plugin-eslint-comments": "^3.2.0",
-        "eslint-plugin-json-schema-validator": "^2.0.0",
-        "eslint-plugin-jsonc": "^2.0.0",
-        "eslint-plugin-markdown": "^2.0.0-0",
-        "eslint-plugin-node": "^11.1.0",
-        "eslint-plugin-prettier": "^4.0.0",
-        "eslint-plugin-regexp": "^1.0.0",
-        "eslint-plugin-yml": "^0.14.0",
-        "mocha": "^9.0.0",
-        "nyc": "^15.0.1",
-        "pako": "^2.0.4",
-        "postcss": "^8.0.0",
-        "postcss-scss": "^4.0.1",
-        "postcss-syntax": "^0.36.2",
-        "prettier": "^2.2.1",
-        "stylelint": "^16.0.0",
-        "stylelint-config-recommended": "^14.0.0",
-        "stylelint-stylus": "file:.",
-        "vitepress": "^1.0.1"
-    },
-    "dependencies": {
-        "html-tags": "^3.1.0",
-        "lodash": "^4.17.15",
-        "mathml-tag-names": "^2.1.3",
-        "postcss-html": "^1.0.1",
-        "postcss-media-query-parser": "^0.2.3",
-        "postcss-selector-parser": "^6.0.2",
-        "postcss-styl": "^0.12.2",
-        "postcss-value-parser": "^4.2.0",
-        "semver": "^7.5.4",
-        "style-search": "^0.1.0",
-        "stylelint-config-html": "^1.0.0",
-        "svg-tags": "^1.0.0"
-    },
-    "engines": {
-        "node": "^12 || >=14"
+  "name": "stylelint-stylus",
+  "version": "1.0.0",
+  "description": "Stylelint plugin for Stylus",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "custom-syntax",
+    "standard",
+    "recommended",
+    "base-config",
+    "no-stylus"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test:base": "mocha \"tests/runs/**/*.js\" --reporter dot --timeout 60000",
+    "test": "nyc npm run test:base -- --timeout 60000",
+    "cover:report": "nyc report --reporter=html",
+    "test:cover": "npm run test && npm run cover:report",
+    "update-fixtures": "cross-env UPDATE_FIXTURES=true npm run test:base",
+    "preversion": "npm run update && npm run test",
+    "version": "npm run lint -- --fix && git add .",
+    "update": "node ./scripts/update.js",
+    "docs:watch": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:build-and-preview": "npm run docs:build && npx http-server docs/.vitepress/dist",
+    "stylelint": "stylelint \"docs/.vitepress/**/*.css\" \"docs/.vitepress/**/*.vue\" \"docs/.vitepress/**/*.styl\"",
+    "make-alias-package": "node ./scripts/make-alias-package.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stylus/stylelint-stylus.git"
+  },
+  "keywords": [
+    "stylelint-plugin",
+    "stylelint",
+    "stylus",
+    "lint",
+    "linter",
+    "pretty",
+    "beautify"
+  ],
+  "author": "Yosuke Ota",
+  "funding": "https://opencollective.com/stylus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stylus/stylelint-stylus/issues"
+  },
+  "homepage": "https://stylus.github.io/stylelint-stylus/",
+  "peerDependencies": {
+    "postcss-syntax": "^0.36.2",
+    "stylelint": "^13.2.1 || ^14 || ^15 || ^16"
+  },
+  "peerDependenciesMeta": {
+    "postcss-syntax": {
+      "optional": true
     }
+  },
+  "devDependencies": {
+    "@ota-meshi/eslint-plugin": "^0.10.0",
+    "@shikijs/vitepress-twoslash": "^1.2.2",
+    "@types/lodash": "^4.14.149",
+    "cross-env": "^7.0.2",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^8.0.0",
+    "eslint-plugin-eslint-comments": "^3.2.0",
+    "eslint-plugin-json-schema-validator": "^2.0.0",
+    "eslint-plugin-jsonc": "^2.0.0",
+    "eslint-plugin-markdown": "^2.0.0-0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-regexp": "^1.0.0",
+    "eslint-plugin-yml": "^0.14.0",
+    "mocha": "^9.0.0",
+    "nyc": "^15.0.1",
+    "pako": "^2.0.4",
+    "postcss": "^8.0.0",
+    "postcss-scss": "^4.0.1",
+    "postcss-syntax": "^0.36.2",
+    "prettier": "^2.2.1",
+    "stylelint": "^16.0.0",
+    "stylelint-config-recommended": "^14.0.0",
+    "stylelint-stylus": "file:.",
+    "vitepress": "^1.0.1"
+  },
+  "dependencies": {
+    "html-tags": "^3.1.0",
+    "lodash": "^4.17.15",
+    "mathml-tag-names": "^2.1.3",
+    "postcss-html": "^1.0.1",
+    "postcss-media-query-parser": "^0.2.3",
+    "postcss-selector-parser": "^6.0.2",
+    "postcss-styl": "^0.12.2",
+    "postcss-value-parser": "^4.2.0",
+    "semver": "^7.5.4",
+    "style-search": "^0.1.0",
+    "stylelint-config-html": "^1.0.0",
+    "svg-tags": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
 }
