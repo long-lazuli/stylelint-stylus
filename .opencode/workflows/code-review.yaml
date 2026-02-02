@@ -1,0 +1,497 @@
+# Code Review Workflow
+# Comprehensive code review before finalizing issue completion
+
+name: code-review
+version: 1.0.0
+description: |
+  Performs a thorough code review of the completed development work, ensuring all quality
+  gates are met, Stylus compliance is verified, and the implementation matches specifications.
+  This workflow should be run after dev-story completes.
+
+trigger:
+  manual: true
+  automatic: false
+  command: "code review"
+  aliases:
+    - "review"
+    - "review code"
+    - "check code"
+
+prerequisites:
+  - Issue marked 🔵 In Review (dev-story finished)
+  - Commit created with issue reference
+  - All tests passing
+  - No uncommitted changes
+
+# Code Review Steps
+steps:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REVIEW 1: CODE QUALITY
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: review_code_quality
+    name: "Review 1: Code Quality"
+    description: Check code quality, patterns, and maintainability
+
+    checks:
+      - name: Code Style Compliance
+        description: Verify code follows project style
+        tool: Bash
+        command: "npm run lint"
+        expected: "No linting errors"
+
+      - name: Type Safety (Phase 3+)
+        description: Verify TypeScript types are correct
+        tool: Bash
+        command: "npm run type-check"
+        expected: "No type errors"
+        required_if: "Phase 3 or later"
+
+      - name: Code Patterns
+        description: Ensure code follows existing patterns
+        review_points:
+          - Consistent naming conventions
+          - Proper error handling
+          - Clear function purposes
+          - Appropriate use of utilities
+
+      - name: Documentation Quality
+        description: Check inline documentation
+        review_points:
+          - Functions have JSDoc/TSDoc comments
+          - Complex logic explained
+          - Stylus doc references included
+          - TODO/FIXME items justified
+
+      - name: No Debug Code
+        description: Verify no debug artifacts left
+        check_for:
+          - console.log statements
+          - debugger statements
+          - commented out code blocks
+          - temporary test skips
+
+    outputs:
+      code_quality_score: "pass/fail"
+      issues_found: []
+
+    pass_criteria:
+      - Linting passes
+      - Type checking passes (Phase 3+)
+      - Code follows project patterns
+      - Documentation adequate
+      - No debug code present
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REVIEW 2: TEST COVERAGE & QUALITY
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: review_tests
+    name: "Review 2: Test Coverage & Quality"
+    description: Verify test quality and coverage
+
+    checks:
+      - name: Test Execution
+        description: All tests pass
+        tool: Bash
+        command: "npm test"
+        expected: "All tests pass"
+
+      - name: Coverage Metrics
+        description: Coverage meets thresholds
+        tool: Bash
+        command: "npm run test:coverage"
+        expected: "Coverage ≥ 80% on all metrics"
+        thresholds:
+          lines: 80
+          branches: 80
+          functions: 80
+          statements: 80
+
+      - name: Test Quality
+        description: Tests are meaningful and well-structured
+        review_points:
+          - Tests have clear descriptions
+          - Tests reference Stylus documentation
+          - Edge cases covered
+          - No redundant tests
+          - Assertions are meaningful
+
+      - name: Fixture Quality
+        description: Test fixtures are appropriate
+        review_points:
+          - Fixtures based on Stylus docs
+          - Real-world scenarios included
+          - Input/output pairs correct
+          - Warnings.json accurate
+
+      - name: Test Maintenance
+        description: Tests are maintainable
+        review_points:
+          - No brittle tests (overly specific)
+          - Good separation of concerns
+          - Reusable test utilities
+          - Clear test organization
+
+    outputs:
+      test_coverage: "{percentage}%"
+      test_quality_score: "pass/fail"
+      coverage_gaps: []
+
+    pass_criteria:
+      - All tests pass
+      - Coverage ≥ 80% on all metrics
+      - Tests reference Stylus docs
+      - Fixtures are appropriate
+      - Tests are maintainable
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REVIEW 3: STYLUS COMPLIANCE
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: review_stylus_compliance
+    name: "Review 3: Stylus Compliance"
+    description: Verify implementation matches Stylus specification
+
+    checks:
+      - name: Stylus Documentation Cross-Reference
+        description: Implementation matches Stylus docs
+        actions:
+          - Read Stylus documentation sections from issue
+          - Compare implementation against spec
+          - Verify no deviations
+
+      - name: No False Positives
+        description: Ensure valid Stylus isn't incorrectly flagged
+        method: "Test with examples from Stylus documentation"
+
+      - name: Edge Cases from Stylus Docs
+        description: Handle unusual but valid Stylus syntax
+        test_against:
+          - Parent reference (&)
+          - Partial reference (^[N])
+          - Mixed syntax styles
+          - Optional syntax (braces, semicolons, colons)
+
+      - name: Real-World Stylus Files
+        description: Test against actual Stylus projects
+        recommended_sources:
+          - Bootstrap Stylus examples
+          - Nib library code
+          - Stylus documentation examples
+        tool: Bash
+        command: "npm run stylelint -- test-file/*.styl"
+
+      - name: Stylus Feature Coverage
+        description: All documented Stylus features handled
+        verify:
+          - Selectors (all types)
+          - Comments (all types)
+          - At-rules (all types)
+          - Syntax styles (pythonic, CSS, mixed)
+
+    outputs:
+      stylus_compliant: "yes/no"
+      false_positives: []
+      missing_features: []
+
+    pass_criteria:
+      - Implementation matches Stylus docs
+      - No false positives found
+      - Edge cases handled correctly
+      - Real-world files lint correctly
+      - All relevant Stylus features covered
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REVIEW 4: ISSUE REQUIREMENTS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: review_requirements
+    name: "Review 4: Issue Requirements"
+    description: Verify all issue requirements met
+
+    checks:
+      - name: Current State vs Target State
+        description: Target state achieved
+        actions:
+          - Read issue "Current State" section
+          - Read issue "Target State" section
+          - Verify implementation achieves target
+
+      - name: Tasks Checklist
+        description: All tasks completed
+        verify: "All checkboxes in issue are checked"
+
+      - name: Success Criteria
+        description: All success criteria met
+        actions:
+          - Read "Success Criteria" from issue
+          - Verify each criterion
+          - Document verification
+
+      - name: Dependencies Respected
+        description: Dependent issues not broken
+        check:
+          - Run tests for dependent code
+          - Verify no regressions
+
+      - name: Testing Requirements
+        description: Testing requirements from issue met
+        verify:
+          - Unit tests added/updated
+          - Integration tests (if required)
+          - Coverage requirements met
+          - Real-world testing done
+
+    outputs:
+      requirements_met: "yes/no"
+      unmet_requirements: []
+
+    pass_criteria:
+      - Target state achieved
+      - All tasks checked
+      - All success criteria met
+      - No regressions
+      - Testing requirements fulfilled
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REVIEW 5: DOCUMENTATION
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: review_documentation
+    name: "Review 5: Documentation"
+    description: Verify documentation is complete and accurate
+
+    checks:
+      - name: Inline Code Documentation
+        description: Code is well-documented
+        review_points:
+          - Functions have proper doc comments
+          - Complex logic explained
+          - Stylus spec references included
+          - Parameters documented
+          - Return values documented
+
+      - name: Test Documentation
+        description: Tests reference Stylus docs
+        verify: "Each test includes Stylus doc URL"
+        format: "// Reference: https://stylus-lang.com/docs/{section}"
+
+      - name: Issue Documentation
+        description: Issue file is up to date
+        verify:
+          - Status updated to 🔵 In Review
+          - Tasks all checked
+          - Implementation notes added (if applicable)
+
+      - name: Commit Message
+        description: Commit message is clear and references issue
+        format: "{type}: {description} (#{issue_number})"
+        examples:
+          - "feat: add Node.js 18+ support (#001)"
+          - "test: add integration tests for selectors (#005)"
+
+      - name: README Updates
+        description: README updated if needed
+        required_if: "User-facing changes or new features"
+
+    outputs:
+      documentation_complete: "yes/no"
+      missing_docs: []
+
+    pass_criteria:
+      - Code well-documented
+      - Tests reference Stylus docs
+      - Issue file updated
+      - Commit message correct
+      - README updated (if needed)
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # REVIEW 6: INTEGRATION & REGRESSIONS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: review_integration
+    name: "Review 6: Integration & Regressions"
+    description: Verify no regressions and proper integration
+
+    checks:
+      - name: Full Test Suite
+        description: All tests pass (not just new ones)
+        tool: Bash
+        command: "npm test"
+        expected: "All tests pass"
+
+      - name: No Regressions
+        description: Existing functionality unchanged
+        verify:
+          - Old tests still pass
+          - No unexpected behavior changes
+          - No breaking changes (unless intentional)
+
+      - name: Cross-File Integration
+        description: Changes integrate well with other modules
+        check:
+          - Imports/exports correct
+          - Interfaces compatible
+          - No circular dependencies
+
+      - name: Build Process
+        description: Project builds successfully
+        tool: Bash
+        command: "npm run build"
+        required_if: "Phase 3+ (TypeScript)"
+
+      - name: Documentation Build
+        description: Docs still build
+        tool: Bash
+        command: "npm run docs:build"
+        expected: "Docs build successfully"
+
+    outputs:
+      integration_ok: "yes/no"
+      regressions_found: []
+
+    pass_criteria:
+      - Full test suite passes
+      - No regressions detected
+      - Proper integration
+      - Build successful (Phase 3+)
+      - Docs build successfully
+
+# Review Summary
+summary:
+  - name: Generate Review Report
+    output: |
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      📋 CODE REVIEW REPORT - ISSUE #{issue_number}
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      Review Date: {date}
+      Issue: #{issue_number} - {issue_name}
+
+      REVIEW RESULTS:
+
+      1. Code Quality:           {pass/fail}
+         - Linting:              {pass/fail}
+         - Type Check:           {pass/fail} (Phase 3+)
+         - Patterns:             {pass/fail}
+         - Documentation:        {pass/fail}
+         
+      2. Test Coverage:          {pass/fail}
+         - Tests Pass:           {pass/fail}
+         - Coverage:             {percentage}% (≥80%)
+         - Test Quality:         {pass/fail}
+         - Fixtures:             {pass/fail}
+         
+      3. Stylus Compliance:      {pass/fail}
+         - Spec Match:           {pass/fail}
+         - No False Positives:   {pass/fail}
+         - Edge Cases:           {pass/fail}
+         - Real-world Files:     {pass/fail}
+         
+      4. Requirements:           {pass/fail}
+         - Target State:         {pass/fail}
+         - Tasks Complete:       {pass/fail}
+         - Success Criteria:     {pass/fail}
+         - No Regressions:       {pass/fail}
+         
+      5. Documentation:          {pass/fail}
+         - Code Docs:            {pass/fail}
+         - Test Docs:            {pass/fail}
+         - Issue Updated:        {pass/fail}
+         - Commit Message:       {pass/fail}
+         
+      6. Integration:            {pass/fail}
+         - All Tests Pass:       {pass/fail}
+         - No Regressions:       {pass/fail}
+         - Integration OK:       {pass/fail}
+         - Build OK:             {pass/fail}
+
+      OVERALL: {PASS / FAIL}
+
+      {issues_found}
+
+      {recommendations}
+
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  - name: Decision
+    conditions:
+      all_pass:
+        action: approve
+        message: |
+          ✅ CODE REVIEW APPROVED
+
+          All quality gates passed. Issue #{issue_number} is approved.
+
+          Next Steps:
+          1. Update issue status: 🔵 In Review → 🟢 Completed
+          2. Push commit to repository
+          3. Start next issue: run 'start next dev'
+
+          Manual approval command:
+          → approve issue #{issue_number}
+
+      some_fail:
+        action: request_changes
+        message: |
+          ⚠️ CODE REVIEW - CHANGES REQUESTED
+
+          Issues found that need addressing:
+          {issues_list}
+
+          Next Steps:
+          1. Address review feedback
+          2. Amend or create new commit
+          3. Run tests again
+          4. Run 'code review' again
+
+      critical_fail:
+        action: reject
+        message: |
+          ❌ CODE REVIEW REJECTED
+
+          Critical issues found:
+          {critical_issues}
+
+          Next Steps:
+          1. Revert changes if necessary
+          2. Review issue requirements
+          3. Restart dev-story workflow
+
+# Success Criteria
+success:
+  - All 6 review sections pass
+  - No critical issues found
+  - Stylus compliance verified
+  - All tests passing
+  - Coverage ≥ 80%
+  - Documentation complete
+
+# Quality Gates
+quality_gates:
+  mandatory:
+    - All tests pass
+    - Coverage ≥ 80%
+    - No linting errors
+    - Stylus spec compliant
+    - All success criteria met
+
+  recommended:
+    - No type errors (Phase 3+)
+    - Real-world testing done
+    - Docs build successfully
+    - No debug code
+
+  nice_to_have:
+    - Code refactored for clarity
+    - Edge cases thoroughly tested
+    - Performance optimized
+
+# Metadata
+metadata:
+  author: stylelint-stylus modernization team
+  created: 2026-02-03
+  inspiration: BMAD Method code review workflow
+  adapted_for: stylelint-stylus quality assurance with Stylus spec validation
+  workflow_type: quality_assurance

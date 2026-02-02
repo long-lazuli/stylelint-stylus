@@ -1,0 +1,99 @@
+# OpenCode Configuration
+# Agent system configuration for stylelint-stylus
+
+version: 1.0.0
+project: stylelint-stylus
+type: modernization
+
+# Project Paths
+paths:
+  root: ..
+  issues: ../issues
+  documentation: ../issues/ROADMAP.md
+  source: ../lib
+  tests: ../tests
+
+# Agent Configuration
+agents:
+  default: refactorer
+
+  available:
+    - name: refactorer
+      config: agents/refactorer.agent.yaml
+      instructions: agents/refactorer.instructions.md
+      status: active
+
+# Project Context
+context:
+  language: stylus
+  framework: stylelint
+  target_node: ">=18.0.0"
+
+  modernization_goals:
+    - Node.js 18+ LTS support
+    - Vitest testing framework
+    - Full TypeScript migration
+    - Integration tests
+    - 80% code coverage
+
+  documentation:
+    stylus: https://stylus-lang.com/docs/
+    stylelint: https://stylelint.io/
+    vitest: https://vitest.dev/
+    typescript: https://www.typescriptlang.org/docs/
+
+# Workflow Configuration
+workflow:
+  type: documentation_tests_development
+  strict_mode: true
+  validation_required: true
+
+  steps:
+    - read_documentation
+    - plan_tests
+    - write_tests
+    - implement_changes
+    - verify_refine
+    - update_issue_status
+
+# Issue Tracking
+issue_tracking:
+  enabled: true
+  path: ../issues/modernization
+
+  phases:
+    - phase-1-foundation
+    - phase-2-testing
+    - phase-3-typescript
+    - phase-4-future
+
+  status_indicators:
+    not_started: "🔴 Not Started"
+    in_progress: "🟡 In Progress"
+    in_review: "🔵 In Review"
+    completed: "🟢 Completed"
+    blocked: "⏸️ Blocked"
+    cancelled: "❌ Cancelled"
+
+# Quality Gates
+quality:
+  coverage_threshold: 80
+  stylus_compliance_required: true
+  real_world_testing_required: true
+  documentation_required: true
+
+# Safety Rules
+safety:
+  require_documentation_read: true
+  require_tests_before_implementation: true
+  prevent_multiple_issues_parallel: true
+  require_issue_reference_in_commits: true
+  validate_against_stylus_spec: true
+
+# Metadata
+metadata:
+  created: 2026-02-03
+  author: stylelint-stylus modernization team
+  inspiration: BMAD Method
+  total_issues: 11
+  estimated_duration: 10-11 weeks

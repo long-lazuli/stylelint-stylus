@@ -1,0 +1,257 @@
+================================================================================
+  THE REFACTORER AGENT - SETUP COMPLETE
+================================================================================
+
+Created: 2026-02-03
+Agent Version: 1.0.0
+Inspired by: BMAD Method (bmad-master.agent.yaml, dev.agent.yaml)
+Adapted for: stylelint-stylus modernization workflow
+
+AGENT FILES CREATED:
+--------------------
+✓ .opencode/agents/refactorer.agent.yaml        - Agent configuration (YAML)
+✓ .opencode/agents/refactorer.instructions.md   - Detailed instructions
+✓ .opencode/config.yaml                         - OpenCode system config
+✓ .opencode/README.md                           - Agent system guide
+✓ .opencode/AGENT-QUICKSTART.md                 - Quick reference card
+✓ MODERNIZATION.md (updated)                    - Added agent reference
+
+AGENT CAPABILITIES:
+-------------------
+✓ Strict workflow enforcement (Documentation → Tests → Development)
+✓ Automatic Stylus documentation reading and validation
+✓ Test-driven development (TDD) with RED-GREEN-REFACTOR
+✓ Issue tracking and progress updates
+✓ Coverage enforcement (≥80%)
+✓ Real-world Stylus file testing
+✓ Incremental, one-issue-at-a-time execution
+✓ Safety rules to prevent workflow violations
+
+WORKFLOW (6 STEPS):
+-------------------
+1. Read Documentation     - Issue file + Stylus docs
+2. Plan Tests            - Design test structure
+3. Write/Update Tests    - TDD RED phase
+4. Implement Changes     - TDD GREEN phase
+5. Verify & Refine       - Full validation
+6. Update Issue Status   - Track progress (🔴→🟡→🟢)
+
+STRICT CONSTRAINTS:
+-------------------
+NEVER:
+  ❌ Start without reading documentation
+  ❌ Skip writing tests
+  ❌ Break Stylus language support
+  ❌ Work on multiple issues simultaneously
+  ❌ Ignore Stylus documentation references
+
+ALWAYS:
+  ✅ Read issue + Stylus docs first
+  ✅ Write tests before implementation
+  ✅ Reference Stylus docs in tests
+  ✅ Update issue status as you work
+  ✅ Validate against Stylus spec
+  ✅ Maintain ≥80% coverage
+
+HOW TO INVOKE THE AGENT:
+-------------------------
+
+Method 1 - Direct Invocation (Recommended):
+
+  Tell your AI assistant:
+  
+  """
+  You are The Refactorer agent for stylelint-stylus modernization.
+  
+  Read your configuration from:
+  - .opencode/agents/refactorer.agent.yaml
+  - .opencode/agents/refactorer.instructions.md
+  
+  Then: Start issue #001
+  """
+
+Method 2 - Natural Language:
+
+  @refactorer start issue #001
+  @refactorer continue current issue
+  @refactorer show progress
+
+AVAILABLE COMMANDS:
+-------------------
+- Start issue #NNN           → Begin work on specific issue
+- Continue current issue     → Resume in-progress issue  
+- Show progress              → Display status and next steps
+- Validate Stylus compliance → Check feature against spec
+
+INTEGRATION WITH MODERNIZATION PLAN:
+-------------------------------------
+The agent executes issues from:
+  issues/modernization/
+  ├── phase-1-foundation/   (Issues 001-003)
+  ├── phase-2-testing/      (Issues 004-006)
+  ├── phase-3-typescript/   (Issues 007-010)
+  └── phase-4-future/       (Issue 011, optional)
+
+Total: 11 issues across 4 phases (10-11 weeks)
+
+WHAT THE AGENT READS:
+---------------------
+On First Invocation:
+  - MODERNIZATION.md (quick start)
+  - issues/README.md (issue guide)
+  - issues/ROADMAP.md (complete roadmap)
+
+On Every Invocation:
+  - Current issue file from issues/modernization/
+  - Referenced Stylus documentation (https://stylus-lang.com/docs/)
+  - Relevant technical docs (Vitest, TypeScript, etc.)
+
+QUALITY GATES:
+--------------
+Before completing ANY issue:
+  ☑ All tasks checked off
+  ☑ All tests pass
+  ☑ Coverage ≥80%
+  ☑ Stylus docs validated
+  ☑ Real-world testing done
+  ☑ Issue marked 🟢 Completed
+
+EXAMPLE SESSION:
+----------------
+User: Start issue #001
+
+Agent: 
+  📋 Starting Issue #001: Node.js Update
+  
+  Reading documentation:
+  - Issue: issues/.../001-nodejs-update.md ✓
+  - Current: Node 12+ support
+  - Target: Node 18+ LTS
+  
+  Step 1: Read Documentation ✓
+  Step 2: Plan Tests ✓
+  Step 3: Write Tests ✓
+  Step 4: Implement Changes ✓
+    - Updated package.json engines
+    - Updated CI matrix
+  Step 5: Verify & Refine ✓
+    - All tests pass ✓
+  Step 6: Update Issue Status ✓
+  
+  🎉 Issue #001 Completed!
+  
+  Next: Issue #002 (Dependency Updates)
+
+STYLUS DOCUMENTATION INTEGRATION:
+----------------------------------
+Agent automatically references:
+  - Selectors:    https://stylus-lang.com/docs/selectors
+  - Comments:     https://stylus-lang.com/docs/comments
+  - @extend:      https://stylus-lang.com/docs/extend
+  - @media:       https://stylus-lang.com/docs/media
+  - Variables:    https://stylus-lang.com/docs/variables
+  - Mixins:       https://stylus-lang.com/docs/mixins
+  - Hashes:       https://stylus-lang.com/docs/hashes
+  - CSS Style:    https://stylus-lang.com/docs/css-style
+  - Iteration:    https://stylus-lang.com/docs/iteration
+  - Conditionals: https://stylus-lang.com/docs/conditionals
+
+CONFIGURATION STRUCTURE:
+------------------------
+.opencode/
+├── agents/
+│   ├── refactorer.agent.yaml        # YAML configuration
+│   └── refactorer.instructions.md   # Detailed instructions
+├── config.yaml                      # System configuration
+├── README.md                        # Usage guide
+├── AGENT-QUICKSTART.md              # Quick reference
+└── AGENT-SETUP-COMPLETE.txt         # This file
+
+DOCUMENTATION REFERENCES:
+-------------------------
+- Agent Config:      .opencode/agents/refactorer.agent.yaml
+- Agent Instructions: .opencode/agents/refactorer.instructions.md
+- Quick Start:       .opencode/AGENT-QUICKSTART.md
+- System Guide:      .opencode/README.md
+- Project Roadmap:   issues/ROADMAP.md
+- Issue Guide:       issues/README.md
+
+TESTING THE AGENT:
+------------------
+1. Read .opencode/AGENT-QUICKSTART.md
+2. Invoke the agent with "Start issue #001"
+3. Watch it execute the strict 6-step workflow
+4. Verify it reads documentation before acting
+5. Confirm tests are written before implementation
+6. Check issue status updates to 🟢
+
+TROUBLESHOOTING:
+----------------
+Agent not reading docs?
+  → Remind: "Read the issue file and Stylus documentation first"
+
+Agent skipping tests?
+  → Remind: "Follow the strict 6-step workflow. Write tests before code."
+
+Agent rushing?
+  → Remind: "Take your time. Read documentation thoroughly."
+
+SAFETY FEATURES:
+----------------
+✓ Mandatory documentation reading
+✓ Test-first enforcement (TDD)
+✓ Stylus spec validation required
+✓ One issue at a time (no parallel work)
+✓ Issue reference required in commits
+✓ Success criteria verification
+
+EXPECTED BEHAVIOR:
+------------------
+✓ Reads full issue file before starting
+✓ Reads ALL referenced Stylus docs
+✓ Plans tests based on documentation
+✓ Writes tests with Stylus doc URLs
+✓ Implements to make tests pass
+✓ Runs full test suite + coverage
+✓ Updates issue status (🔴→🟡→🟢)
+✓ Documents findings and progress
+
+PROGRESS TRACKING:
+------------------
+Current: 0 / 11 issues (0%)
+Status: Ready to begin
+Next: Issue #001 (Node.js Update)
+
+The agent will track:
+  - Issues completed (🟢)
+  - Current issue (🟡)
+  - Next issues (🔴)
+  - Dependencies met
+  - Overall progress %
+
+================================================================================
+  THE REFACTORER IS READY!
+================================================================================
+
+QUICK START:
+
+1. Read:  .opencode/AGENT-QUICKSTART.md
+2. Invoke: Tell your AI "You are The Refactorer agent..."
+3. Execute: "Start issue #001"
+4. Watch: Agent follows strict workflow
+5. Verify: Progress updates and quality gates
+
+The agent will execute all 11 issues with:
+  ✓ Documentation-first approach
+  ✓ Test-driven development
+  ✓ Stylus spec validation
+  ✓ Progress tracking
+  ✓ Quality assurance
+
+READY TO MODERNIZE WITH PRECISION! 🚀
+
+================================================================================
+
+Next Step: Read .opencode/AGENT-QUICKSTART.md and invoke The Refactorer!
+
+Good luck with the modernization!

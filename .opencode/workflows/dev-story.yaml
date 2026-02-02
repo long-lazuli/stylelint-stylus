@@ -1,0 +1,545 @@
+# Dev Story Workflow
+# Core development workflow following Documentation → Tests → Development
+
+name: dev-story
+version: 1.0.0
+description: |
+  Executes the core development workflow for the current issue, following the strict
+  6-step process: Read Documentation → Plan Tests → Write Tests → Implement → Verify → Update Status.
+  This is the main workflow that The Refactorer agent executes.
+
+trigger:
+  manual: true
+  automatic: true (from start-next-dev)
+  command: "dev story"
+  aliases:
+    - "develop"
+    - "continue development"
+    - "work on current issue"
+
+prerequisites:
+  - One issue must be 🟡 In Progress
+  - Agent must have read issue file
+  - Development environment ready (dependencies installed)
+
+# The 6-Step Workflow
+steps:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STEP 1: READ DOCUMENTATION
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: step_1_read_documentation
+    name: "Step 1: Read Documentation"
+    description: Read issue file and all referenced documentation
+    duration: 15-30 minutes
+
+    actions:
+      - name: Read Issue File
+        tool: Read
+        file: "{issue_path}"
+        required: true
+        extract:
+          - current_state
+          - target_state
+          - dependencies
+          - tasks_checklist
+          - success_criteria
+          - stylus_documentation_references
+          - testing_requirements
+
+      - name: Read Stylus Documentation
+        tool: WebFetch
+        urls: "{stylus_refs from issue}"
+        required: true
+        note: "Read ALL referenced Stylus doc sections"
+
+      - name: Read Technical Documentation
+        tool: WebFetch
+        urls: "{technical_refs from issue}"
+        required_if: "Phase 2+ (Vitest, TypeScript, etc.)"
+        examples:
+          - vitest.dev/guide
+          - typescript.org/docs
+
+      - name: Read Related Code
+        tool: Read
+        files: "{affected_files from issue}"
+        required_if: "Modifying existing code"
+
+      - name: Understand Current Architecture
+        tool: Glob + Read
+        pattern: "{affected_modules}/**/*.js"
+        required: true
+
+    outputs:
+      requirements_understood: true
+      stylus_features_identified: ["list of features"]
+      technical_approach_clear: true
+      affected_files: ["list"]
+
+    validation:
+      - Issue file fully read and understood
+      - Current state documented
+      - Target state clear
+      - All Stylus documentation references read
+      - Technical requirements understood
+      - Dependencies verified
+      - Success criteria noted
+
+    halt_if_not_validated: true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STEP 2: PLAN TESTS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: step_2_plan_tests
+    name: "Step 2: Plan Tests"
+    description: Design test structure based on documentation
+    duration: 15-30 minutes
+
+    actions:
+      - name: Identify Test Cases from Stylus Docs
+        description: Extract test scenarios from Stylus documentation
+        required: true
+        outputs:
+          - stylus_feature_tests: ["list of Stylus features to test"]
+          - edge_cases: ["list of edge cases"]
+
+      - name: Design Test Structure
+        description: Plan test files and organization
+        required: true
+        outputs:
+          - test_files: ["list of test files to create/update"]
+          - fixture_requirements: ["list of fixtures needed"]
+
+      - name: Plan Coverage Targets
+        description: Identify coverage goals
+        required: true
+        outputs:
+          - coverage_targets: "≥80% on all metrics"
+          - critical_paths: ["paths that MUST be covered"]
+
+      - name: Plan Integration Tests
+        description: Identify real-world scenarios to test
+        required_if: "Phase 2+ or affects multiple files"
+        outputs:
+          - integration_scenarios: ["list of scenarios"]
+
+    outputs:
+      test_plan_documented: true
+      test_cases_identified: ["list"]
+      fixtures_planned: ["list"]
+      coverage_strategy: "documented"
+
+    validation:
+      - All Stylus features from docs covered
+      - Edge cases identified
+      - Real-world scenarios planned
+      - Coverage targets defined
+      - Test structure clear
+
+    output_format: |
+      ✅ Step 2 Complete: Test Plan
+
+      Test Cases from Stylus Docs:
+      {stylus_feature_tests}
+
+      Edge Cases:
+      {edge_cases}
+
+      Test Files:
+      {test_files}
+
+      Fixtures Needed:
+      {fixture_requirements}
+
+      Coverage Target: ≥80%
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STEP 3: WRITE/UPDATE TESTS (TDD RED PHASE)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: step_3_write_tests
+    name: "Step 3: Write/Update Tests (RED Phase)"
+    description: Implement tests following TDD - tests should FAIL
+    duration: 30-60 minutes
+
+    actions:
+      - name: Write Test Files
+        tool: Write
+        files: "{test_files from plan}"
+        required: true
+        template: |
+          import { describe, it, expect } from 'vitest'
+
+          describe('Stylus Feature: {feature_name}', () => {
+            // Reference: {stylus_doc_url}
+            
+            it('should {test_description}', async () => {
+              // Test based on Stylus documentation
+              const result = await lintStylus(`
+                {stylus_code_example_from_docs}
+              `)
+              
+              expect(result.warnings).toHaveLength(0)
+            })
+          })
+
+      - name: Create/Update Fixtures
+        tool: Write
+        files: "{fixture_files from plan}"
+        required: true
+        structure: |
+          tests/fixtures/{category}/{rule}/{option}/{scenario}/
+          ├── input.styl
+          ├── output.styl (if fixable)
+          └── warnings.json
+
+      - name: Add Stylus Doc References
+        description: Include Stylus documentation URLs in test descriptions
+        required: true
+        format: "// Reference: https://stylus-lang.com/docs/{section}"
+
+      - name: Run Tests (Verify RED)
+        tool: Bash
+        command: "npm test -- {test_file}"
+        required: true
+        expected: "Tests should FAIL (RED phase)"
+
+    outputs:
+      test_files_created: ["list"]
+      fixtures_created: ["list"]
+      tests_failing_appropriately: true
+      stylus_docs_referenced: true
+
+    validation:
+      - Test files created/updated
+      - All tests reference Stylus docs
+      - Fixtures include Stylus examples
+      - Tests run and FAIL appropriately (RED)
+      - Error messages are clear
+
+    halt_if:
+      - Tests pass immediately (no RED phase)
+      - Tests don't run (syntax errors)
+
+    output_format: |
+      ✅ Step 3 Complete: Tests Written (RED Phase)
+
+      Test Files Created:
+      {test_files_created}
+
+      Fixtures Created:
+      {fixtures_created}
+
+      Test Results:
+      ❌ {failing_count} tests failing (expected)
+
+      Stylus Documentation Referenced:
+      {stylus_refs_in_tests}
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STEP 4: IMPLEMENT CHANGES (TDD GREEN PHASE)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: step_4_implement
+    name: "Step 4: Implement Changes (GREEN Phase)"
+    description: Write code to make tests pass
+    duration: 1-3 hours
+
+    actions:
+      - name: Implement According to Specification
+        tool: Edit
+        files: "{affected_files}"
+        required: true
+        guidelines:
+          - Follow existing code patterns
+          - Add inline documentation
+          - Reference Stylus spec in comments
+          - Keep changes focused on issue scope
+
+      - name: Add Inline Documentation
+        description: Comment code with Stylus spec references
+        required: true
+        format: |
+          // Validates {feature} per Stylus spec:
+          // https://stylus-lang.com/docs/{section}
+
+      - name: Run Tests Iteratively
+        tool: Bash
+        command: "npm test -- {test_file}"
+        frequency: "After each logical change"
+        expected: "Tests gradually pass (GREEN phase)"
+
+      - name: Validate Against Stylus Spec
+        description: Ensure implementation matches Stylus documentation
+        required: true
+        method: "Cross-reference implementation with Stylus docs"
+
+    outputs:
+      implementation_complete: true
+      tests_passing: true
+      stylus_spec_compliant: true
+
+    validation:
+      - All tests pass (GREEN phase)
+      - No regressions (existing tests still pass)
+      - Code follows project patterns
+      - Inline docs added with Stylus refs
+      - Stylus spec compliance verified
+
+    output_format: |
+      ✅ Step 4 Complete: Implementation (GREEN Phase)
+
+      Files Modified:
+      {modified_files}
+
+      Test Results:
+      ✅ {passing_count} / {total_count} tests passing
+
+      Stylus Compliance:
+      ✅ Validated against {stylus_sections}
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STEP 5: VERIFY & REFINE
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: step_5_verify
+    name: "Step 5: Verify & Refine"
+    description: Comprehensive verification and refinement
+    duration: 30 minutes
+
+    actions:
+      - name: Run Full Test Suite
+        tool: Bash
+        command: "npm test"
+        required: true
+        expected: "All tests pass"
+
+      - name: Check Coverage
+        tool: Bash
+        command: "npm run test:coverage"
+        required: true
+        expected: "Coverage ≥ 80% (or maintained)"
+
+      - name: Test with Real Stylus Files
+        tool: Bash
+        command: |
+          # Test against real-world Stylus (if applicable)
+          npm run stylelint -- test-file/*.styl
+        required_if: "Changes affect rule behavior"
+
+      - name: Run Linting
+        tool: Bash
+        command: "npm run lint"
+        required: true
+        expected: "No linting errors"
+
+      - name: Run Type Checking
+        tool: Bash
+        command: "npm run type-check"
+        required_if: "Phase 3+ (TypeScript)"
+        expected: "No type errors"
+
+      - name: Validate Stylus Compliance
+        description: Final check against Stylus spec
+        required: true
+        method: |
+          - Re-read Stylus documentation sections
+          - Verify no false positives
+          - Test edge cases from Stylus docs
+
+      - name: Refactor if Needed
+        description: Clean up code while keeping tests green
+        required_if: "Code can be improved"
+        guidelines:
+          - Maintain test passing state
+          - Follow DRY principle
+          - Improve readability
+
+    outputs:
+      all_tests_pass: true
+      coverage_maintained: "≥80%"
+      linting_clean: true
+      type_check_clean: true (Phase 3+)
+      stylus_compliance_verified: true
+      real_world_tested: true
+
+    validation:
+      - Full test suite passes
+      - Coverage ≥ 80% (or maintained)
+      - No linting errors
+      - No type errors (Phase 3+)
+      - Real-world Stylus files tested
+      - Stylus spec compliance confirmed
+      - Code is clean and maintainable
+
+    output_format: |
+      ✅ Step 5 Complete: Verification & Refinement
+
+      Test Suite: ✅ All {total} tests pass
+      Coverage: ✅ {coverage}% (≥80%)
+      Linting: ✅ Clean
+      Type Check: ✅ Clean (Phase 3+)
+      Real-world: ✅ Tested against Stylus files
+      Stylus Compliance: ✅ Verified
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STEP 6: UPDATE ISSUE STATUS
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  - id: step_6_update_status
+    name: "Step 6: Update Issue Status & Submit for Review"
+    description: Update issue tracking and submit for review
+    duration: 15 minutes
+
+    actions:
+      - name: Check Off Completed Tasks
+        tool: Edit
+        file: "{issue_path}"
+        action: "Check off all completed tasks in checklist"
+
+      - name: Verify Success Criteria
+        description: Ensure all success criteria are met
+        required: true
+        checklist: "{success_criteria from issue}"
+
+      - name: Document Findings
+        description: Add notes about implementation
+        required_if: "Any deviations or notable decisions"
+        format: |
+          ## Implementation Notes
+
+          {findings}
+
+      - name: Update Issue Status to In Review
+        tool: Edit
+        file: "{issue_path}"
+        change: "Status from In Progress to In Review (🟡 → 🔵)"
+        required: true
+
+      - name: Create Commit
+        tool: Bash
+        command: |
+          git add .
+          git commit -m "{commit_type}: {description} (#{issue_number})"
+        required: true
+        commit_types:
+          - feat: New feature
+          - fix: Bug fix
+          - refactor: Code refactoring
+          - test: Test updates
+          - chore: Infrastructure
+
+      - name: Prepare for Code Review
+        description: Ready the changes for review
+        actions:
+          - Verify commit message references issue
+          - Ensure all files staged
+          - Check for leftover debug code
+
+    outputs:
+      issue_updated: true
+      tasks_checked: true
+      success_criteria_met: true
+      commit_created: true
+      ready_for_review: true
+
+    validation:
+      - All tasks in issue checked off
+      - All success criteria verified
+      - Issue status updated to 🔵 In Review
+      - Commit created with issue reference
+      - No uncommitted changes
+      - Ready for code review
+
+    output_format: |
+      ✅ Step 6 Complete: Issue Submitted for Review
+
+      Issue: #{issue_number} 🔵 In Review
+      Tasks: {completed}/{total} checked
+      Success Criteria: ✅ All met
+      Commit: {commit_hash}
+
+      Next: Run code-review workflow or manual review
+      After approval: Update status to 🟢 Completed
+
+# Post-Workflow Actions
+post_workflow:
+  - name: Display Completion Summary
+    output: |
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      🎉 ISSUE #{issue_number} DEVELOPMENT COMPLETE - SUBMITTED FOR REVIEW
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      Status: 🔵 In Review
+
+      Summary:
+      {implementation_summary}
+
+      Tests: ✅ {test_count} tests passing
+      Coverage: ✅ {coverage}%
+      Stylus Compliance: ✅ Verified
+
+      Files Changed:
+      {changed_files}
+
+      Next Steps:
+      1. Run 'code-review' workflow (or manual review)
+      2. If approved, update status to 🟢 Completed
+      3. Commit is ready (user will push when ready)
+      4. Start next issue
+
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  - name: Suggest Next Action
+    output: |
+      Run code review:
+        → code-review
+        
+      Or start next issue:
+        → start next dev
+
+# Success Criteria
+success:
+  - All 6 steps completed
+  - All validations passed
+  - Tests passing (GREEN)
+  - Coverage ≥ 80%
+  - Stylus compliance verified
+  - Issue status updated to 🔵 In Review
+  - Commit created
+  - Ready for review (human or automated)
+
+# Error Handling
+errors:
+  no_issue_in_progress:
+    message: "No issue is currently 🟡 In Progress. Run 'start next dev' first."
+
+  tests_not_failing:
+    message: "Tests passed in RED phase. Write failing tests first (TDD)."
+    halt_at: step_3_write_tests
+
+  tests_not_passing:
+    message: "Tests still failing in GREEN phase. Fix implementation."
+    halt_at: step_4_implement
+
+  coverage_dropped:
+    message: "Coverage decreased to {new_coverage}%. Maintain ≥80%."
+    halt_at: step_5_verify
+
+  stylus_compliance_failed:
+    message: "Implementation doesn't match Stylus spec. Review documentation."
+    halt_at: step_5_verify
+
+  success_criteria_not_met:
+    message: "Not all success criteria met:\n{unmet_criteria}"
+    halt_at: step_6_update_status
+
+# Metadata
+metadata:
+  author: stylelint-stylus modernization team
+  created: 2026-02-03
+  inspiration: BMAD Method dev workflow
+  adapted_for: stylelint-stylus TDD workflow with Stylus spec validation
+  workflow_type: core_development

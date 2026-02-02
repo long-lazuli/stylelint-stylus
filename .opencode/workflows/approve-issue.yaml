@@ -1,0 +1,191 @@
+# Approve Issue Workflow
+# Approve and finalize a reviewed issue
+
+name: approve-issue
+version: 1.0.0
+description: |
+  Approves an issue that has been reviewed and passed all quality gates.
+  Updates the issue status from 🔵 In Review to 🟢 Completed.
+  Can be executed by the user (manual approval) or automatically after code-review passes.
+
+trigger:
+  manual: true
+  automatic: true (after code-review approval)
+  command: "approve issue"
+  aliases:
+    - "approve"
+    - "finalize issue"
+    - "complete issue"
+
+prerequisites:
+  - Issue status is 🔵 In Review
+  - Code review passed (or manual review complete)
+  - All quality gates met
+  - Commit exists
+
+steps:
+  - id: verify_review_status
+    name: Verify Review Complete
+    description: Ensure issue is ready for approval
+
+    checks:
+      - name: Check Issue Status
+        verify: "Issue status is 🔵 In Review"
+        fail_if: "Status is not In Review"
+
+      - name: Verify Code Review
+        description: Confirm review passed or was done manually
+        options:
+          - Automated code-review workflow passed
+          - Manual review by user complete
+
+      - name: Check Quality Gates
+        verify:
+          - All tests pass
+          - Coverage ≥ 80%
+          - No linting errors
+          - Success criteria met
+
+    outputs:
+      review_verified: true
+      ready_to_approve: true
+
+  - id: update_issue_status
+    name: Update Issue to Completed
+    description: Mark issue as completed
+
+    actions:
+      - name: Update Status
+        tool: Edit
+        file: "{issue_path}"
+        change: "Status: 🔵 In Review → Status: 🟢 Completed"
+
+      - name: Add Completion Timestamp
+        description: Record when issue was completed
+        format: |
+          **Completed:** {date_time}
+          **Reviewed by:** {reviewer_name or 'automated'}
+
+    outputs:
+      issue_completed: true
+      completion_time: "{timestamp}"
+
+  - id: final_verification
+    name: Final Verification
+    description: Last check before finalization
+
+    actions:
+      - name: Verify No Uncommitted Changes
+        tool: Bash
+        command: "git status --porcelain"
+        expected: "Only issue file updated"
+
+      - name: Commit Status Update
+        tool: Bash
+        command: |
+          git add {issue_path}
+          git commit -m "chore: approve issue #{issue_number} - mark completed"
+
+    outputs:
+      finalized: true
+
+  - id: display_summary
+    name: Display Approval Summary
+    output: |
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      ✅ ISSUE #{issue_number} APPROVED & COMPLETED
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      Status: 🟢 Completed
+      Completed: {completion_time}
+      Reviewed by: {reviewer}
+
+      Summary:
+      {implementation_summary}
+
+      Quality Metrics:
+      - Tests: ✅ All passing
+      - Coverage: ✅ {coverage}%
+      - Linting: ✅ Clean
+      - Stylus Compliance: ✅ Verified
+
+      Next Steps:
+      1. Commits are ready (2 commits created):
+         - Implementation commit
+         - Approval commit
+         
+      2. User will git push when ready
+         
+      3. Start next issue:
+         → start next dev
+
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Success Criteria
+success:
+  - Issue status updated to 🟢 Completed
+  - Completion recorded
+  - Status update committed
+  - Ready to push
+
+# Error Handling
+errors:
+  not_in_review:
+    message: |
+      ⚠️ Cannot approve issue
+
+      Issue #{issue_number} status is {current_status}, not 🔵 In Review.
+
+      Run dev-story workflow first to submit for review.
+
+  quality_gates_failed:
+    message: |
+      ❌ Cannot approve - quality gates failed
+
+      Failed checks:
+      {failed_checks}
+
+      Fix issues and run code-review again.
+
+  uncommitted_changes:
+    message: |
+      ⚠️ Uncommitted changes detected
+
+      Commit or stash changes before approving:
+      {uncommitted_files}
+
+# Usage Examples
+examples:
+  - scenario: "After automated code-review passes"
+    command: "approve issue #001"
+    output: |
+      ✅ ISSUE #001 APPROVED & COMPLETED
+      Status: 🟢 Completed
+
+      Next: git push && start next dev
+
+  - scenario: "Manual approval after self-review"
+    command: "approve"
+    note: "Approves current issue in review"
+    output: |
+      ✅ Current issue approved
+
+      Next steps: Push and continue
+
+# Integration
+integrates_with:
+  - workflow: dev-story
+    relationship: follows (dev-story → approve-issue)
+
+  - workflow: code-review
+    relationship: triggered_by (code-review approval → approve-issue)
+
+  - workflow: start-next-dev
+    relationship: precedes (approve-issue → start-next-dev)
+
+# Metadata
+metadata:
+  author: stylelint-stylus modernization team
+  created: 2026-02-03
+  workflow_type: approval
+  allows_manual_execution: true

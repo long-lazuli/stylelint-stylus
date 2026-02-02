@@ -1,0 +1,196 @@
+# Start Next Dev Workflow
+# Transitions the next issue to "in progress" and initiates development
+
+name: start-next-dev
+version: 1.0.0
+description: |
+  Finds the next issue to work on (based on dependencies), updates its status to 
+  "🟡 In Progress", and automatically starts the dev-story workflow to begin implementation.
+
+trigger:
+  manual: true
+  command: "start next dev"
+  aliases:
+    - "start next"
+    - "begin next issue"
+    - "start next story"
+
+prerequisites:
+  - No issue currently 🟡 In Progress (one at a time rule)
+  - Next issue dependencies are all 🟢 Completed
+  - Agent has read MODERNIZATION.md and issues/ROADMAP.md
+
+steps:
+  - id: find_next_issue
+    name: Find Next Available Issue
+    description: Locate the next issue that can be started
+    actions:
+      - Check for any 🟡 In Progress issues
+      - If found, abort with message "Issue already in progress"
+      - Scan issues/modernization/ for 🔴 Not Started issues
+      - Check dependencies for each candidate
+      - Select first issue where all dependencies are 🟢 Completed
+
+    outputs:
+      issue_number: "NNN"
+      issue_name: "issue-name"
+      issue_path: "issues/modernization/phase-N-name/NNN-issue-name.md"
+      phase: "N"
+      phase_name: "phase-name"
+
+    validation:
+      - Next issue found
+      - Dependencies verified
+      - Issue file exists
+
+    on_error:
+      - If no issue found: "All issues completed! 🎉"
+      - If dependencies not met: "Issue #NNN blocked by: [list]"
+
+  - id: update_issue_status
+    name: Update Issue Status to In Progress
+    description: Mark the issue as actively being worked on
+    actions:
+      - Read issue file
+      - Update status line from "🔴 Not Started" to "🟡 In Progress"
+      - Save issue file
+      - Commit change with message: "chore: start issue #NNN"
+
+    outputs:
+      issue_updated: true
+      commit_hash: "abc123..."
+
+    validation:
+      - Issue file updated
+      - Status is now 🟡 In Progress
+      - Commit successful
+
+  - id: display_issue_summary
+    name: Display Issue Summary
+    description: Show key information about the issue being started
+    actions:
+      - Extract from issue file:
+          - Title
+          - Description
+          - Current state
+          - Target state
+          - Dependencies
+          - Estimated effort
+          - Tasks checklist
+          - Success criteria
+          - Stylus documentation references
+
+    output_format: |
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      📋 STARTING ISSUE #{issue_number}: {issue_name}
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+      Phase: {phase} - {phase_name}
+      Status: 🟡 In Progress
+      Effort: {effort}
+
+      📄 Description:
+      {description}
+
+      📍 Current State:
+      {current_state}
+
+      🎯 Target State:
+      {target_state}
+
+      🔗 Dependencies: {dependencies}
+
+      📚 Stylus Documentation:
+      {stylus_refs}
+
+      ✅ Success Criteria:
+      {success_criteria}
+
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  - id: initiate_dev_story
+    name: Start Dev Story Workflow
+    description: Automatically begin the development workflow
+    actions:
+      - Invoke dev-story workflow
+      - Pass issue context
+
+    outputs:
+      workflow_started: true
+
+# Workflow Context
+context:
+  issue_number: "{from step find_next_issue}"
+  issue_name: "{from step find_next_issue}"
+  issue_path: "{from step find_next_issue}"
+  phase: "{from step find_next_issue}"
+
+# Success Criteria
+success:
+  - Next issue identified
+  - Issue status updated to 🟡 In Progress
+  - Issue summary displayed
+  - Dev-story workflow initiated
+
+# Error Handling
+errors:
+  no_next_issue:
+    message: |
+      🎉 No more issues to start!
+
+      All issues are either:
+      - 🟢 Completed
+      - 🟡 In Progress
+      - ⏸️ Blocked (dependencies not met)
+
+      Current progress: {completed} / {total} issues
+
+  issue_already_in_progress:
+    message: |
+      ⚠️ Cannot start new issue
+
+      Issue #{current_issue} is already 🟡 In Progress.
+
+      Please complete or pause current issue first:
+      - Complete current: Continue with dev-story workflow
+      - Pause current: Update status to 🔴 or ⏸️
+
+  dependencies_not_met:
+    message: |
+      ⏸️ Issue #{issue_number} is blocked
+
+      Waiting for:
+      {blocked_by_list}
+
+      Complete blocking issues first.
+
+# Example Usage
+examples:
+  - command: "start next dev"
+    scenario: "No issue in progress, #001 is next"
+    expected_output: |
+      📋 STARTING ISSUE #001: Node.js Update
+      Status: 🟡 In Progress
+
+      Initiating dev-story workflow...
+
+  - command: "start next dev"
+    scenario: "Issue #003 in progress"
+    expected_output: |
+      ⚠️ Cannot start new issue
+      Issue #003 is already 🟡 In Progress
+
+# Integration
+integrates_with:
+  - workflow: dev-story
+    relationship: invokes
+
+  - workflow: code-review
+    relationship: sequential (after dev-story completes)
+
+# Metadata
+metadata:
+  author: stylelint-stylus modernization team
+  created: 2026-02-03
+  inspiration: BMAD Method start-next-dev workflow
+  adapted_for: stylelint-stylus issue-based development
