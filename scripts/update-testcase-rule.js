@@ -8,7 +8,7 @@ const ROOT = path.resolve(__dirname, "../tests/runs/lib/rules")
 
 for (const rule of rules) {
     // Update files.
-    const filePath = path.resolve(ROOT, `${rule.fileName}.js`)
+    const filePath = path.resolve(ROOT, `${rule.fileName}.test.js`)
     const content = `/*
  * IMPORTANT!
  * This file has been automatically generated,

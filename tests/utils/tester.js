@@ -210,6 +210,7 @@ async function lintCode(code, codeFilename, options = {}) {
     return (stylelint.default || stylelint).lint({
         code,
         codeFilename,
+        quietDeprecationWarnings: true,
         ...options,
     })
 }

@@ -3,7 +3,7 @@
     "files": {
         "includes": [
             "**",
-            "!.nyc_output",
+
             "!.opencode",
             "!.devcontainer",
             "!coverage",
