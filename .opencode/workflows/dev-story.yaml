@@ -11,7 +11,7 @@ description: |
 trigger:
   manual: true
   automatic: true (from start-next-dev)
-  command: "dev story"
+  command: "dev-story"
   aliases:
     - "develop"
     - "continue development"

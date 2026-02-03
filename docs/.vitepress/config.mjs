@@ -1,7 +1,7 @@
-import { defineConfig } from "vitepress"
+import { transformerTwoslash } from "@shikijs/vitepress-twoslash"
 import path from "path"
 import { fileURLToPath } from "url"
-import { transformerTwoslash } from "@shikijs/vitepress-twoslash"
+import { defineConfig } from "vitepress"
 import { createTwoslasher as createTwoslasherStylelint } from "./twoslash-stylelint/index.mjs"
 
 const filename = fileURLToPath(import.meta.url)

@@ -11,7 +11,7 @@ description: |
 trigger:
   manual: true
   automatic: true (after code-review approval)
-  command: "approve issue"
+  command: "approve-issue"
   aliases:
     - "approve"
     - "finalize issue"

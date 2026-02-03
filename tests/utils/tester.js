@@ -110,8 +110,8 @@ function runFixtures(
             const lang = fixture.input.endsWith(".styl")
                 ? "stylus"
                 : fixture.input.endsWith(".css")
-                ? "css"
-                : null
+                  ? "css"
+                  : null
             if (lang === "stylus" || lang === "css") {
                 it("lint with raw parser", () =>
                     lintFixture(fixture, {
@@ -206,7 +206,6 @@ function lintFixture(fixture, options = {}) {
 }
 
 async function lintCode(code, codeFilename, options = {}) {
-    // eslint-disable-next-line node/no-unsupported-features/es-syntax -- ignore
     const stylelint = await import("stylelint")
     return (stylelint.default || stylelint).lint({
         code,

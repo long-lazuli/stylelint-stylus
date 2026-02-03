@@ -9,7 +9,7 @@ description: |
 
 trigger:
   manual: true
-  command: "start next dev"
+  command: "start-next-dev"
   aliases:
     - "start next"
     - "begin next issue"

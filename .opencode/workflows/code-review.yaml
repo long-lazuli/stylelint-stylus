@@ -11,7 +11,7 @@ description: |
 trigger:
   manual: true
   automatic: false
-  command: "code review"
+  command: "code-review"
   aliases:
     - "review"
     - "review code"

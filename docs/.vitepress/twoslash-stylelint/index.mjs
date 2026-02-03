@@ -1,10 +1,10 @@
-import { fileURLToPath } from "node:url"
 import * as path from "node:path"
+import { fileURLToPath } from "node:url"
+import { createSyncFn } from "synckit"
 import {
     createPositionConverter,
     resolveNodePositions,
 } from "twoslash-protocol"
-import { createSyncFn } from "synckit"
 
 function createTwoslasher(options) {
     const { includeDocs = true, mergeMessages = true } = options
